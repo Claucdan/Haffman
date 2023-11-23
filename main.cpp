@@ -19,8 +19,8 @@ private:
     std::vector<std::pair<char,long double>> probability_of_abc;
     std::vector<node_of_tree> graf_of_haffman;
     priority_queue selection_of_two_min;
-
-    std::vector<std::vector<node_of_tree>> layer;
+    node_of_tree* root;
+    std::vector<std::vector<node_of_tree*>> layer;
 
 
 
@@ -63,21 +63,49 @@ private:
         selection_of_two_min.cost_queue(probability_of_abc);
     }
     void _haffman_tree_creation(){
+        _first_layer_creat();
         while(selection_of_two_min.size()>1){
             node_of_tree* first=selection_of_two_min.extract_min();
             node_of_tree* second=selection_of_two_min.extract_min();
             node_of_tree* third_parent=new node_of_tree;
-            third_parent->abc=std::max(first->abc,second->abc);
+            third_parent->abc=std::min(first->abc,second->abc);
             third_parent->level= std::max(first->level,second->level)+1;
             third_parent->probability=first->probability+second->probability;
-            third_parent->left_child=first;
-            third_parent->right_child=second;
+            if(first->abc<second->abc) {
+                third_parent->left_child = first;
+                third_parent->right_child = second;
+            }
+            else{
+                third_parent->left_child = second;
+                third_parent->right_child = first;
+            }
             std::cout<<third_parent->abc<<" "<<third_parent->level<<" "<<third_parent->probability<<"\n";
             selection_of_two_min.insert(third_parent);
+
+            if(layer.size()<third_parent->level)
+                layer.resize(third_parent->level);
+            layer[third_parent->level-1].push_back(third_parent);
         }
+        root=selection_of_two_min.extract_min();
     }
     void _show_selection_of_two_min(){
         selection_of_two_min.show_queue();
+    }
+    void _first_layer_creat(){
+        std::vector<node_of_tree*>& host=selection_of_two_min.heap_ret();
+        layer.resize(1);
+        layer[0].resize(abc.size());
+        for(int i=0;i<abc.size();i++){
+            layer[0][i]=host[i];
+        }
+    }
+    void _cod_of_abc(node_of_tree* root,std::string code){
+        if(root->right_child== nullptr && root->left_child== nullptr){
+            std::cout<<root->abc<<" "<<code<<"\n";
+            return;
+        }
+        _cod_of_abc(root->left_child,code+"0");
+        _cod_of_abc(root->right_child,code+"1");
     }
 public:
     Haffman(){
@@ -85,6 +113,9 @@ public:
     }
     void probability_of_abc_creat(){
         _probability_of_abc_creat();
+    }
+    void show_abc(){
+        _show_abc();
     }
     void show_probability_of_abc(){
         _show_probability_of_abc();
@@ -94,6 +125,17 @@ public:
     }
     void show_selection_of_two_min(){
         _show_selection_of_two_min();
+    }
+    void first_layer_show(){
+        for(int i=0;i<layer.size();i++){
+            for(int j=0;j<layer[i].size();j++){
+                std::cout<<layer[i][j]->probability<<" ";
+            }
+            std::cout<<"\n";
+        }
+    }
+    void cod_of_abc(){
+        _cod_of_abc(root,"");
     }
     void huffman(){
         _haffman_tree_creation();
@@ -108,7 +150,7 @@ int main() {
     coding.selection_of_two_min_creat();
     coding.show_selection_of_two_min();
     coding.huffman();
-
-    priority_queue mass_of_layer;
+    coding.first_layer_show();
+    coding.cod_of_abc();
     return 0;
 }

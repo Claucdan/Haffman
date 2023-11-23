@@ -48,6 +48,9 @@ public:
     int size(){
         return heap.size();
     }
+    std::vector<node_of_tree*>& heap_ret(){
+        return heap;
+    }
 };
 
 
