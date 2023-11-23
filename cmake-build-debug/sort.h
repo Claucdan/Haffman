@@ -13,9 +13,9 @@ struct node_of_tree {
     node_of_tree *right_child = nullptr;
 };
 bool comp_of_sort(node_of_tree* first,node_of_tree* second){
-    if(first->probability!=second->probability)
-        return first->probability<second->probability;
-    return first->abc<second->abc;
+    if(first->probability == second->probability)
+        return first->abc < second->abc;
+    return first->probability < second->probability;
 }
 void sort(std::vector<node_of_tree*>& mass,int left, int right){
     if(left>=right)return;
